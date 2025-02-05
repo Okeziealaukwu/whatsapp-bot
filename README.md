@@ -69,4 +69,4 @@ Coding Group,Alice,Any updates?,2348098765432,02/05/2025,14:35
 [!IMPORTANT] It is not guaranteed you will not be blocked by using this method. WhatsApp does not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.
 
 ## License
-This project is open-source and available under the MIT License.
+This project is open-source and available under the Apache License.
