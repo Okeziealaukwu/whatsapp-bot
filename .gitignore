@@ -132,3 +132,7 @@ dist
 # web js cache
 .wwebjs_auth
 .wwebjs_cache
+
+#chat file
+chat_logs.csv
+chat_logs.txt
