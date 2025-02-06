@@ -23,7 +23,7 @@ client.on('qr', qr => {
 
 // Function to clear file every hour
 function clearLogFile() {
-    fs.writeFileSync(logFile, "Group Name,Sender Name,Time Stamp,Message,Phone Number\n"); // Reset file with headers
+    fs.writeFileSync(logFile, "Group Name,Sender Name,Message,Phone Number,Time Stamp\n"); // Reset file with headers
     console.log("Old messages cleared. Starting fresh...");
 }
 
@@ -36,10 +36,10 @@ function logMessageToFile(data) {
 client.on('ready', () => {
     console.log('Client is ready!');
 
-    const headers = `${"Group Name".padEnd(25)} ${"Sender Name".padEnd(20)} ${"Time Stamp".padEnd(22)} ${"Message".padEnd(30)} ${"Phone Number"}`;
+    const headers = `${"Group Name".padEnd(25)} ${"Sender Name".padEnd(20)} ${"Message".padEnd(30)} ${"Phone Number"} ${"Time Stamp".padEnd(22)}`;
     //Clear csv
     if (!fs.existsSync(logFile)) {
-        logMessageToFile("Group Name,Sender Name,Time Stamp,Message,Phone Number");
+        logMessageToFile("Group Name,Sender Name,Message,Phone Number,Time Stamp");
     }
 
      // Print column headers
@@ -74,8 +74,8 @@ async function formatAndLogMessage(message) {
 // });
 
 //Get specific WhatsApp messages from groups
-const groupId1 = 'xxxxxxxxxxx@g.us';  // Replace with actual group ID
-const groupId2 = 'xxxxxxxxxxx@g.us';  // Replace with actual group ID
+const groupId1 = 'xxxxxxxx';  // Replace with actual group ID
+const groupId2 = 'xxxxxxxx';  // Replace with actual group ID
 
 client.on('message', async message => {
     if (message.from === groupId1 || message.from === groupId2) {
