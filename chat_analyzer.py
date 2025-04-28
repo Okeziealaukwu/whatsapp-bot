@@ -29,7 +29,7 @@
 
 # # for idx, row in df.iterrows():
 # #     message = str(row.iloc[1])  # 3rd column: message text
-    
+
 # #     # Count how many parameters are found in this message
 # #     count = 0
 # #     for regex in patterns.values():
@@ -41,10 +41,10 @@
 # #         # Extract date and time from the designated columns
 # #         date_val = row.iloc[3]
 # #         time_val = row.iloc[4]
-        
+
 # #         # Initialize a dictionary with date and time
 # #         log_data = {"Date": date_val, "Time": time_val}
-        
+
 # #         # Apply each specific regex to extract the parameter value
 # #         for param, regex in patterns.items():
 # #             match = re.search(regex, message)
@@ -76,10 +76,10 @@
 #     # Load the existing workbook
 #     book = load_workbook(excel_file)
 #     startrow = book[sheet_name].max_row if sheet_name in book.sheetnames else 0
-    
+
 #     # Write to Excel using context manager
 #     with pd.ExcelWriter(excel_file, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-#         df_log.to_excel(writer, sheet_name=sheet_name, index=False, 
+#         df_log.to_excel(writer, sheet_name=sheet_name, index=False,
 #                        startrow=startrow, header=(startrow == 0))
 # else:
 #     # Create new file if it doesn't exist
@@ -89,4 +89,4 @@
 
 # print(f"Chat logs saved to {excel_file} successfully!")
 
-print("Hello World!)
+print("Hello World!")

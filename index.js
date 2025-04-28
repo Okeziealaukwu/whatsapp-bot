@@ -26,36 +26,11 @@ client.on("qr", (qr) => {
 
 // Function to clear file only if Python script runs successfully
 function clearLogFile() {
-  console.log("Running chat analyzer before clearing logs...");
-
-  const pythonProcess = spawn("python", [
-    path.join(__dirname, "chat_analyzer.py"),
-  ]);
-
-  // Optional: Capture output and error data
-  pythonProcess.stdout.on("data", (data) => {
-    console.log(`Python Output: ${data.toString()}`);
-  });
-
-  pythonProcess.stderr.on("data", (data) => {
-    console.error(`Python Error: ${data.toString()}`);
-  });
-
-  // When the Python process finishes
-  pythonProcess.on("close", (code) => {
-    if (code === 0) {
-      // Clear the CSV file by writing the header only
-      fs.writeFileSync(
-        logFile,
-        "Group Name,Sender Name,Message,Phone Number,Date,Time\n"
-      );
-      console.log(
-        "Python analysis successful. Old messages cleared. Starting fresh..."
-      );
-    } else {
-      console.error("Python analysis failed. CSV log file not cleared.");
-    }
-  });
+  fs.writeFileSync(
+    logFile,
+    "Group Name,Sender Name,Message,Phone Number,Time Stamp\n"
+  ); // Reset file with headers
+  console.log("Old messages cleared. Starting fresh...");
 }
 
 // Function to write a message to the file
@@ -75,9 +50,14 @@ client.on("ready", () => {
   // Print column headers to console for readability
   const headers = `${"Group Name".padEnd(25)} ${"Sender Name".padEnd(
     20
-  )} ${"Message".padEnd(30)} ${"Phone Number"} ${"Date".padEnd(
-    12
-  )} ${"Time".padEnd(10)}`;
+  )} ${"Message".padEnd(30)} ${"Phone Number"} ${"Time Stamp".padEnd(22)}`;
+
+  //Clear csv
+  if (!fs.existsSync(logFile)) {
+    logMessageToFile("Group Name,Sender Name,Message,Phone Number,Time Stamp");
+  }
+
+  // Print column headers
   console.log(headers);
   console.log("-".repeat(120)); // Separator line
 
@@ -88,16 +68,9 @@ client.on("ready", () => {
 // Format and log messages to the CSV file
 async function formatAndLogMessage(message) {
   const chat = await message.getChat();
-  const sender = await message.getContact();
-
-  // Create a date object from the timestamp
-  const dateObj = new Date(message.timestamp * 1000);
-
-  // Format date and time separately
-  const date = dateObj.toLocaleDateString();
-  const time = dateObj.toLocaleTimeString();
-
-  const phoneNumber = sender.id._serialized.split("@")[0];
+  const sender = await message.getContact(); // Fetch sender's contact details
+  const timestamp = new Date(message.timestamp * 1000).toLocaleString(); // Converts to local date & time
+  const phoneNumber = sender.id._serialized.split("@")[0]; // Extract user's number
   const senderName = sender.pushname || sender.name || "Unknown";
 
   // Sanitize message body to avoid breaking CSV formatting
@@ -108,9 +81,7 @@ async function formatAndLogMessage(message) {
   // Update console output to include separate date and time
   const formattedMessage = `${chat.name.padEnd(25)} ${senderName.padEnd(
     20
-  )} ${sanitizedMessageBody.padEnd(30)} ${phoneNumber} ${date.padEnd(
-    12
-  )} ${time.padEnd(10)}`;
+  )} ${sanitizedMessageBody.padEnd(30)} ${phoneNumber} ${timestamp.padEnd(22)}`;
 
   // Update CSV format with separate date and time columns
   const csvFormattedMessage = `${chat.name},${senderName},${sanitizedMessageBody},${phoneNumber},${date},${time}`;
@@ -119,38 +90,17 @@ async function formatAndLogMessage(message) {
   logMessageToFile(csvFormattedMessage); // Append CSV-formatted message to file
 }
 
-const MONITORED_GROUPS = [
-  "120363409083699079@g.us", // Replace with actual group ID
-  "2349032959233-1543393783@g.us", // Replace with actual group ID
-];
-
-// Specify the group IDs from which you want to log messages
-const groupId1 = "120363049123372020@g.us"; // CNG Dispatch Group
-const groupId2 = "120363320479571887@g.us"; // Wasil CNG Group
-const groupId3 = "120363315079438311@g.us"; // Tempo CNG Group
-const groupId4 = "120363147330091953@g.us"; // Splendor CNG Group
-const groupId5 = "120363118669828226@g.us"; // NigaChem CNG Group
-
-// Commented the following groups out as they are only test groups
-// const groupId6 = "120363038696335071@g.us"; // Heirs Energy PNG Group
-// const groupId7 = "2347032132002-1576913526@g.us"; // CHGC Info Centre Group
-// const groupId8 = "120363409083699079@g.us"; // Whatsapp bot test Group
-
-// Listen only for messages in the specified groups
+// Get all WhatsApp messages.
 // client.on("message", async (message) => {
-//   if (
-//     message.from === groupId1 ||
-//     message.from === groupId2 ||
-//     message.from === groupId3 ||
-//     message.from === groupId4 ||
-//     message.from === groupId5
-//   ) {
-//     await formatAndLogMessage(message);
-//   }
+//   await formatAndLogMessage(message);
 // });
 
+// Get specific WhatsApp messages from groups
+const groupId1 = "120363409083699079@g.us"; // Replace with actual group ID
+const groupId2 = "2349032959233-1543393783@g.us"; // Replace with actual group ID
+
 client.on("message", async (message) => {
-  if (MONITORED_GROUPS.includes(message.from)) {
+  if (message.from === groupId1 || message.from === groupId2) {
     await formatAndLogMessage(message);
   }
 });
