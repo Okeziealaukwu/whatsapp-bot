@@ -11,7 +11,7 @@ const { spawn } = require("child_process");
 const client = new Client({
   authStrategy: new LocalAuth({ clientId: "whatsapp_bot" }), // Add a unique client ID
   puppeteer: {
-    headless: false,
+    headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   },
 });
