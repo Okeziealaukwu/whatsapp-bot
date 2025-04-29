@@ -19,7 +19,6 @@ const client = new Client({
       "--disable-gpu",
       "--no-zygote",
     ],
-    // This explicitly tells Railway where to find Chromium
   },
 });
 
