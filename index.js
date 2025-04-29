@@ -130,19 +130,24 @@ async function formatAndLogMessage(message) {
 //   await formatAndLogMessage(message);
 // });
 
-// Get specific WhatsApp messages from groups
-const groupId1 = "120363409083699079@g.us"; // Replace with actual group ID
-const groupId2 = "2349032959233-1543393783@g.us"; // Replace with actual group ID
+// Specify the group IDs from which you want to log messages
+const groupId1 = "120363049123372020@g.us"; // CNG Dispatch Group
+const groupId2 = "120363320479571887@g.us"; // Wasil CNG Group
+const groupId3 = "120363315079438311@g.us"; // Tempo CNG Group
+const groupId4 = "120363147330091953@g.us"; // Splendor CNG Group
+const groupId5 = "120363118669828226@g.us"; // NigaChem CNG Group
 
+// Commented the following groups out as they are only test groups
+// const groupId6 = "120363038696335071@g.us"; // Heirs Energy PNG Group
+// const groupId7 = "2347032132002-1576913526@g.us"; // CHGC Info Centre Group
+// const groupId8 = "120363409083699079@g.us"; // Whatsapp bot test Group
+
+// Listen only for messages in the specified groups
 client.on("message", async (message) => {
-  if (message.from === groupId1 || message.from === groupId2) {
+  if (message.from === groupId1 || message.from === groupId2 || message.from === groupId3 || message.from === groupId4 || message.from === groupId5)  {
     await formatAndLogMessage(message);
   }
 });
 
 // Start the client
 client.initialize();
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
