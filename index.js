@@ -1,11 +1,15 @@
 // Description: This script uses the WhatsApp Web API to log messages from specific groups into a CSV file.
 // It also runs a Python script to analyze the chat data before clearing the log file.
-
+const express = require("express");
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+let qrCodeData = "";
 
 // Initialize the WhatsApp client
 const client = new Client({
@@ -28,6 +32,32 @@ const logFile = path.join(__dirname, "chat_logs.csv"); // CSV file location
 client.on("qr", (qr) => {
   console.log("Scan this QR code in WhatsApp:");
   qrcode.generate(qr, { small: true });
+  qrcode.toDataURL(qr, (err, url) => {
+    if (err) {
+      console.error("Failed to generate QR", err);
+    } else {
+      qrCodeData = url; // Save the base64 image
+    }
+  });
+});
+
+// Serve the QR code on a page
+app.get("/", (req, res) => {
+  if (!qrCodeData) {
+    return res.send("<h2>QR Code not generated yet. Please wait...</h2>");
+  }
+
+  return res.send(`
+    <html>
+      <head>
+        <title>Scan WhatsApp QR Code</title>
+      </head>
+      <body style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
+        <h1>Scan the QR Code</h1>
+        <img src="${qrCodeData}" alt="QR Code" />
+      </body>
+    </html>
+  `);
 });
 
 // Function to clear file only if Python script runs successfully
@@ -74,26 +104,25 @@ client.on("ready", () => {
 // Format and log messages to the CSV file
 async function formatAndLogMessage(message) {
   const chat = await message.getChat();
-  const sender = await message.getContact(); // Fetch sender's contact details
-  const timestamp = new Date(message.timestamp * 1000).toLocaleString(); // Converts to local date & time
-  const phoneNumber = sender.id._serialized.split("@")[0]; // Extract user's number
+  const sender = await message.getContact();
+  const timestampDate = new Date(message.timestamp * 1000);
+  const date = timestampDate.toLocaleDateString();
+  const time = timestampDate.toLocaleTimeString();
+  const phoneNumber = sender.id._serialized.split("@")[0];
   const senderName = sender.pushname || sender.name || "Unknown";
 
-  // Sanitize message body to avoid breaking CSV formatting
   const sanitizedMessageBody = message.body
     .replace(/[\n\r]/g, " ")
     .replace(/,/g, "");
 
-  // Update console output to include separate date and time
   const formattedMessage = `${chat.name.padEnd(25)} ${senderName.padEnd(
     20
-  )} ${sanitizedMessageBody.padEnd(30)} ${phoneNumber} ${timestamp.padEnd(22)}`;
+  )} ${sanitizedMessageBody.padEnd(30)} ${phoneNumber} ${date} ${time}`;
 
-  // Update CSV format with separate date and time columns
   const csvFormattedMessage = `${chat.name},${senderName},${sanitizedMessageBody},${phoneNumber},${date},${time}`;
 
-  console.log(formattedMessage); // Log formatted message to console
-  logMessageToFile(csvFormattedMessage); // Append CSV-formatted message to file
+  console.log(formattedMessage);
+  logMessageToFile(csvFormattedMessage);
 }
 
 // Get all WhatsApp messages.
@@ -101,12 +130,21 @@ async function formatAndLogMessage(message) {
 //   await formatAndLogMessage(message);
 // });
 
-// Get specific WhatsApp messages from groups
-const groupId1 = "120363409083699079@g.us"; // Replace with actual group ID
-const groupId2 = "2349032959233-1543393783@g.us"; // Replace with actual group ID
+// Specify the group IDs from which you want to log messages
+const groupId1 = "120363049123372020@g.us"; // CNG Dispatch Group
+const groupId2 = "120363320479571887@g.us"; // Wasil CNG Group
+const groupId3 = "120363315079438311@g.us"; // Tempo CNG Group
+const groupId4 = "120363147330091953@g.us"; // Splendor CNG Group
+const groupId5 = "120363118669828226@g.us"; // NigaChem CNG Group
 
+// Commented the following groups out as they are only test groups
+// const groupId6 = "120363038696335071@g.us"; // Heirs Energy PNG Group
+// const groupId7 = "2347032132002-1576913526@g.us"; // CHGC Info Centre Group
+// const groupId8 = "120363409083699079@g.us"; // Whatsapp bot test Group
+
+// Listen only for messages in the specified groups
 client.on("message", async (message) => {
-  if (message.from === groupId1 || message.from === groupId2) {
+  if (message.from === groupId1 || message.from === groupId2 || message.from === groupId3 || message.from === groupId4 || message.from === groupId5)  {
     await formatAndLogMessage(message);
   }
 });
