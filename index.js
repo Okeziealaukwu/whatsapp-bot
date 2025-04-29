@@ -20,7 +20,6 @@ const client = new Client({
       "--no-zygote",
     ],
     // This explicitly tells Railway where to find Chromium
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
   },
 });
 
