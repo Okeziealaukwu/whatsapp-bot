@@ -1,15 +1,15 @@
 // Description: This script uses the WhatsApp Web API to log messages from specific groups into a CSV file.
 // It also runs a Python script to analyze the chat data before clearing the log file.
-const express = require("express");
+// const express = require("express");
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-let qrCodeData = "";
+// const app = express();
+// const PORT = process.env.PORT || 3000;
+// let qrCodeData = "";
 
 // Initialize the WhatsApp client
 const client = new Client({
@@ -32,33 +32,33 @@ const logFile = path.join(__dirname, "chat_logs.csv"); // CSV file location
 client.on("qr", (qr) => {
   console.log("Scan this QR code in WhatsApp:");
   qrcode.generate(qr, { small: true });
-  qrcode.toDataURL(qr, (err, url) => {
-    if (err) {
-      console.error("Failed to generate QR", err);
-    } else {
-      qrCodeData = url; // Save the base64 image
-    }
-  });
+  // qrcode.toDataURL(qr, (err, url) => {
+  //   if (err) {
+  //     console.error("Failed to generate QR", err);
+  //   } else {
+  //     qrCodeData = url; // Save the base64 image
+  //   }
+  // });
 });
 
 // Serve the QR code on a page
-app.get("/", (req, res) => {
-  if (!qrCodeData) {
-    return res.send("<h2>QR Code not generated yet. Please wait...</h2>");
-  }
+// app.get("/", (req, res) => {
+//   if (!qrCodeData) {
+//     return res.send("<h2>QR Code not generated yet. Please wait...</h2>");
+//   }
 
-  return res.send(`
-    <html>
-      <head>
-        <title>Scan WhatsApp QR Code</title>
-      </head>
-      <body style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
-        <h1>Scan the QR Code</h1>
-        <img src="${qrCodeData}" alt="QR Code" />
-      </body>
-    </html>
-  `);
-});
+//   return res.send(`
+//     <html>
+//       <head>
+//         <title>Scan WhatsApp QR Code</title>
+//       </head>
+//       <body style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
+//         <h1>Scan the QR Code</h1>
+//         <img src="${qrCodeData}" alt="QR Code" />
+//       </body>
+//     </html>
+//   `);
+// });
 
 // Function to clear file only if Python script runs successfully
 function clearLogFile() {
@@ -144,7 +144,13 @@ const groupId5 = "120363118669828226@g.us"; // NigaChem CNG Group
 
 // Listen only for messages in the specified groups
 client.on("message", async (message) => {
-  if (message.from === groupId1 || message.from === groupId2 || message.from === groupId3 || message.from === groupId4 || message.from === groupId5)  {
+  if (
+    message.from === groupId1 ||
+    message.from === groupId2 ||
+    message.from === groupId3 ||
+    message.from === groupId4 ||
+    message.from === groupId5
+  ) {
     await formatAndLogMessage(message);
   }
 });
